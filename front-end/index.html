@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt_BR">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Crit Counter</title>
+</head>
+
+<body>
+
+    <fieldset id="critico-form">
+        <legend>Registrar Crítico</legend>
+        
+        <label for="sistema">Sistema</label>
+        <select name="critico" id="sistema">
+            <option value="D&D 5e">D&D 5e</option>
+            <option value="GURPS 4e">GURPS 4e</option>
+        </select>
+
+        <label for="sistema">Tipo de Crítico</label>
+        <select name="critico" id="tipo_critico">
+            <option value="1">Acerto Crítico</option>
+            <option value="0">Erro Crítico</option>
+        </select>
+
+        <label for="jogador">Jogador</label>
+        <input id="jogador" list="jogador-list" name="critico">
+        <datalist id="jogador-list">
+            <!-- vazio! -->
+        </datalist>
+
+        <button id="addCritico">Adicionar</button>
+    </fieldset>
+
+    <hr>
+
+    <section id="container-tabelas">
+        <table id="tblcriticos" data-endpoint="/criticos" data-page-size="10" is="tabela-cabulosa">
+            <caption>Tabela de Críticos</caption>
+            <thead>
+                <tr>
+                    <th data-chave="datahora">Data Hora</th>
+                    <th data-chave="tipo_critico">Crítico</th>
+                    <th data-chave="jogador">Jogador</th>
+                    <th data-chave="sistema">Sistema</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="4">Sem dados...</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <button data-passo="-1">Anterior</button>
+                        <button class="page-info">1 / 1</button>
+                        <button data-passo="1">Próximo</button>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    
+        <table id="tblranking" data-endpoint="/ranking" is="tabela-cabulosa">
+            <caption>Ranking</caption>
+            <thead>
+                <tr>
+                    <th data-chave="jogador">Jogador</th>
+                    <th data-chave="acertos">Acertos</th>
+                    <th data-chave="erros">Erros</th>
+                    <th data-chave="total">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="4">Sem dados...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    
+    <script src="script.js"></script>
+</body>
+
+</html>
