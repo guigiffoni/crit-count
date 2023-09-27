@@ -3,13 +3,27 @@ const $ = (CSSSelector) => document.querySelector(CSSSelector);
 const $$ = (CSSSelector) => document.querySelectorAll(CSSSelector);
 const urlBase = '';
 
-class TabelaCabulosa extends HTMLTableElement {
+class TabelaDinamica extends HTMLTableElement {
 
     constructor() {
         super();
 
-        this.dados = [];
         this.pagina = 1;
+        this.dados = [];
+        this.dadosFiltrados = [];
+    }
+
+    connectedCallback() {
+        const headers = this.querySelectorAll('th[data-chave]');
+        this.colunas = [...headers].map(th => th.dataset.chave);
+        this.tamanhoPagina = parseInt(this.dataset.pageSize) || Infinity;
+        this.querySelectorAll('[fullspan]').forEach(elem => 
+            elem.setAttribute('colspan', this.colunas.length)
+        );
+
+        headers.forEach(header => header.addEventListener('click', this.ordernar.bind(this)));
+        
+        this.refresh();
     }
 
     requestDados() {
@@ -17,7 +31,7 @@ class TabelaCabulosa extends HTMLTableElement {
     }
 
     render() {
-        const intervalo = this.dados.slice((this.pagina - 1) * this.tamanhoPagina, this.pagina * this.tamanhoPagina);
+        const intervalo = this.dadosFiltrados.slice((this.pagina - 1) * this.tamanhoPagina, this.pagina * this.tamanhoPagina);
 
         this.querySelector('tbody').innerHTML = intervalo.reduce((pre, cur) => {
             let string = '<tr>';
@@ -29,14 +43,20 @@ class TabelaCabulosa extends HTMLTableElement {
             return pre + string + '</tr>';
         }, '')
 
-        if (this.querySelector('.page-info')) {
-            this.paginas = Math.ceil(this.dados.length / this.tamanhoPagina);
-            this.querySelector('.page-info').innerHTML = `${this.pagina} / ${this.paginas}`
+        if (intervalo.length == 0) {
+            this.querySelector('tbody').innerHTML = `<td colspan="${this.colunas.length}">Nada encontrado</td>`
         }
+
+        this.dispatchEvent(new CustomEvent('render', {
+            detail: {
+                registros: this.dadosFiltrados.length
+            } 
+        }))
     }
 
     async refresh() {
         this.dados = await this.requestDados();
+        this.dadosFiltrados = this.dados;
 
         this.render();
     }
@@ -57,7 +77,7 @@ class TabelaCabulosa extends HTMLTableElement {
                 break;
         }
         
-        this.dados = this.dados.sort((a, b) => {
+        this.dadosFiltrados = this.dadosFiltrados.sort((a, b) => {
             if (thead.dataset.ordem == 'desc')
                 [a, b] = [b, a];
 
@@ -69,33 +89,90 @@ class TabelaCabulosa extends HTMLTableElement {
 
         this.render();
     }
+}
 
-    mudarPagina(passo) {
-        const novaPagina = this.pagina + parseInt(passo);
-
-        if (novaPagina < 1 || novaPagina > this.paginas)
-            return
-
-        this.pagina = novaPagina;
-        this.render();
-    }
-
+class PesquisaTabela extends HTMLInputElement {
     connectedCallback() {
-        const headers = this.querySelectorAll('th[data-chave]');
-        this.colunas = [...headers].map(th => th.dataset.chave);
-        this.tamanhoPagina = parseInt(this.dataset.pageSize) || Infinity;
+        const objToString = (objeto) => Object.values(objeto).join('').toLowerCase();
+        const tabela = this.closest('table[is="dynamic-table"]');
+        let termoAnterior = '';
 
-        headers.forEach(header => header.addEventListener('click', this.ordernar.bind(this)));
-        this.querySelectorAll('tfoot button[data-passo]').forEach(button => 
-            button.addEventListener('click', evt => this.mudarPagina(evt.target.dataset.passo))
-        )
-        
-        this.refresh();
+        this.addEventListener('keyup', evt => {
+            const termo = evt.target.value.toLowerCase();
+
+            if (termo != termoAnterior) {
+                tabela.dadosFiltrados = tabela.dados.filter(registro => objToString(registro).includes(termo));
+            }
+
+            termoAnterior = termo;
+            tabela.render();
+        })
     }
 }
 
-customElements.define('tabela-cabulosa', TabelaCabulosa, { extends: 'table' });
+class ControleDePagina extends HTMLTableCellElement {
+    connectedCallback() {
+        const tabela = this.closest('table[is="dynamic-table"]');
+        const buttons = [0,0,0,0,0].map(() => document.createElement('button'));
+        const [botaoPrimeira, botaoAnterior, paginaAtual, botaoProxima, botaoUltima] = buttons;
 
+        botaoPrimeira.innerHTML = 'Primeira';
+        botaoAnterior.innerHTML = 'Anterior';
+        botaoProxima.innerHTML = 'Próxima';
+        botaoUltima.innerHTML = 'Última';
+        
+        buttons.forEach((button, index) => {            
+            button.addEventListener('click', () => {
+                switch(index) {
+                    // primeira página
+                    case 0:
+                        tabela.pagina = 1;
+                        break;
+                    // página anterior
+                    case 1:
+                        tabela.pagina -= 1;
+                        break;
+                    // próxima página
+                    case 3:
+                        tabela.pagina += 1;
+                        break;
+                    // última página
+                    case 4:
+                        tabela.pagina = this.ultimaPagina;
+                        break;
+                }
+                
+                tabela.render();
+            })
+
+            this.append(button);
+        })
+
+        tabela.addEventListener('render', evt => {
+            this.ultimaPagina = Math.ceil(evt.detail.registros / tabela.tamanhoPagina) || 1;
+            paginaAtual.innerHTML = `${tabela.pagina} / ${this.ultimaPagina}`;
+
+            // reset no atributo disabled dos botões
+            buttons.forEach(button => button.disabled = false);
+
+            if (tabela.pagina == 1) {
+                botaoPrimeira.disabled = true;
+                botaoAnterior.disabled = true; 
+            }
+
+            if (tabela.pagina == this.ultimaPagina) {
+                botaoProxima.disabled = true;
+                botaoUltima.disabled = true;
+            }
+        })
+    }
+}
+
+customElements.define('dynamic-table', TabelaDinamica, { extends: 'table' });
+customElements.define('table-search', PesquisaTabela, { extends: 'input' });
+customElements.define('table-pager', ControleDePagina, { extends: 'td' });
+
+// Event listeners do formulário de adicionar os críticos
 $('#jogador').addEventListener('keydown', evt => {
     const { key, target } = evt;
 

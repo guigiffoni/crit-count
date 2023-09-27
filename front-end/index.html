@@ -36,9 +36,14 @@
     <hr>
 
     <section id="container-tabelas">
-        <table id="tblcriticos" data-endpoint="/criticos" data-page-size="10" is="tabela-cabulosa">
+        <table id="tbl-critico" data-endpoint="/criticos" data-page-size="10" is="dynamic-table">
             <caption>Tabela de Críticos</caption>
             <thead>
+                <tr>
+                    <th fullspan>
+                        <input type="text" is="table-search">
+                    </th>
+                </tr>
                 <tr>
                     <th data-chave="datahora">Data Hora</th>
                     <th data-chave="tipo_critico">Crítico</th>
@@ -53,16 +58,17 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="4">
+                    <!-- <td colspan="4">
                         <button data-passo="-1">Anterior</button>
                         <button class="page-info">1 / 1</button>
                         <button data-passo="1">Próximo</button>
-                    </td>
+                    </td> -->
+                    <td is="table-pager" fullspan></td>
                 </tr>
             </tfoot>
         </table>
     
-        <table id="tblranking" data-endpoint="/ranking" is="tabela-cabulosa">
+        <table id="tbl-ranking" data-endpoint="/ranking" is="dynamic-table">
             <caption>Ranking</caption>
             <thead>
                 <tr>
