@@ -184,21 +184,21 @@ $('#jogador').addEventListener('keydown', evt => {
     }
 })
 
-$('#addCritico').addEventListener('click', async evt => {
-    const objBase = {};
-    formulario = evt.target.closest('fieldset').querySelectorAll('[name]');
-    
-    for (const campo of formulario) {
-        objBase[campo.id] = campo.value;
-    }
+$('#addCritico').addEventListener('click', async () => {
+    const critico = {
+        'sistema': $('#sistema').value,
+        'tipo_critico': $('.tipo_critico input:checked').value,
+        'jogador': $('#jogador').value
+    };
 
     await fetch(urlBase + '/criticos', {
         method: 'POST',
         headers: { "Content-Type": 'application/json' },
-        body: JSON.stringify(objBase),
+        body: JSON.stringify(critico),
     })
 
     $('#jogador').value = '';
+    $$('input[name="critico"]').forEach(input => input.checked = false);
     $$('table').forEach(table => table.refresh());
 
     recarregarListaDeJogadores();

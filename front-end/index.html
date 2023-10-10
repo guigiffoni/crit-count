@@ -17,12 +17,11 @@
             <option value="D&D 5e">D&D 5e</option>
             <option value="GURPS 4e">GURPS 4e</option>
         </select>
-
-        <label for="sistema">Tipo de Crítico</label>
-        <select name="critico" id="tipo_critico">
-            <option value="1">Acerto Crítico</option>
-            <option value="0">Erro Crítico</option>
-        </select>
+        
+        <label class="tipo_critico" tipo="acerto" for="acerto">
+            <input type="radio" name="critico" value="1" id="acerto" hidden>Acerto Crítico</label>
+        <label class="tipo_critico" tipo="erro" for="erro">
+            <input type="radio" name="critico" value="0" id="erro" hidden>Erro Crítico</label>
 
         <label for="jogador">Jogador</label>
         <input id="jogador" list="jogador-list" name="critico">
