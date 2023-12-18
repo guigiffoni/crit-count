@@ -25,7 +25,7 @@ function handler(req: Request): Response {
         if (req.method == 'GET') {
             query = db.queryEntries(
                 `SELECT
-                    datahora,
+                    DATETIME(datahora, '-3 hours') AS datahora,
                     CASE WHEN tipo_critico = 0 THEN 'Erro' ELSE 'Acerto' END tipo_critico,
                     sistema,
                     jogador
