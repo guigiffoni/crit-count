@@ -5,9 +5,9 @@ Contador de crítico simples acessível através do navegador, acompanha tabelas
 ### Como rodar
 O contador pode ser operador a partir do navegador, o arquivo ```host-api.ts``` contém o código para hostear os arquivos e a API.
 
-[instale a última versão do Deno](https://docs.deno.com/runtime/manual/getting_started/installation) e execute o comando:
+[instale a última versão do Bun](https://bun.sh/docs/installation) e execute o comando:
 ~~~
-deno run --allow-all host-api.ts
+bun run index.ts
 ~~~
 e abra o navegador no endereço:
 ~~~
