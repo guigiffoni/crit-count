@@ -20,8 +20,8 @@ Bun.serve({
         let { pathname } = new URL(req.url);
         pathname = pathname == '/' ? 'index.html' : pathname.slice(1);
 
-        if (pathname.match(/\.\w+/) && Bun.file(`./front/${pathname}`).size > 0) {
-            return new Response(Bun.file(`./front/${pathname}`));
+        if (pathname.match(/\.\w+/) && Bun.file(`./front-end/${pathname}`).size > 0) {
+            return new Response(Bun.file(`./front-end/${pathname}`));
         }
 
         switch(pathname) {
@@ -78,5 +78,5 @@ Bun.serve({
                 return new Response(undefined, { status: 404, statusText: "vish..." });
         }
     },
-    port: 8000,
+    port: 80,
 })
