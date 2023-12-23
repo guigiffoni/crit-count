@@ -29,7 +29,7 @@ Bun.serve({
                 if (req.method == 'GET') {
                     return responseQuery(
                         `SELECT 
-                            DATETIME(datahora, '-3 hour') as datahora, 
+                            DATETIME(datahora, '-3 hour') AS datahora, 
                             CASE WHEN tipo_critico = 0 THEN 'Erro' ELSE 'Acerto' END AS critico,
                             jogador,
                             sistema
@@ -58,8 +58,8 @@ Bun.serve({
                     return responseQuery(
                         `SELECT 
                             jogador, 
-                            COUNT(CASE WHEN tipo_critico = 0) AS erros,
-                            COUNT(CASE WHEN tipo_critico = 1) AS acertos,
+                            COUNT(CASE WHEN tipo_critico = 0 THEN 1 END) AS erros,
+                            COUNT(CASE WHEN tipo_critico = 1 THEN 1 END) AS acertos,
                             COUNT(*) AS total
                         FROM criticos
                         GROUP BY jogador
