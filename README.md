@@ -11,5 +11,5 @@ bun run index.ts
 ~~~
 e abra o navegador no endereço:
 ~~~
-http://localhost
+http://localhost:8000
 ~~~
