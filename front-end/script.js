@@ -172,6 +172,8 @@ customElements.define('dynamic-table', TabelaDinamica, { extends: 'table' });
 customElements.define('table-search', PesquisaTabela, { extends: 'input' });
 customElements.define('table-pager', ControleDePagina, { extends: 'td' });
 
+$$('.tipo_critico').forEach(x => x.addEventListener('click', () => $('#jogador').focus()));
+
 // Event listeners do formulário de adicionar os críticos
 $('#jogador').addEventListener('keydown', evt => {
     const { key, target } = evt;

@@ -80,3 +80,4 @@ Bun.serve({
     },
     port: 8000,
 })
+console.log("http://localhost:8000")
